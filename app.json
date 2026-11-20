@@ -1,11 +1,12 @@
+
 {
   "expo": {
-    "name": "signup-validation",
-    "slug": "signup-validation",
+    "name": "Supabase Authentication",
+    "slug": "cprg303-supabase-auth",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "signupvalidation",
+    "scheme": "cprg303supabaseauth",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
