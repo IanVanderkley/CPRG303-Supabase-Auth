@@ -1,3 +1,4 @@
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import {
@@ -13,7 +14,9 @@ import {
   Text,
   TextInput,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+import PublicRecords from "../components/PublicRecords";
 import { signUpSchema, type SignUpValues } from "../schemas/signup-schema";
 
 type FormFieldProps = {
@@ -56,6 +59,7 @@ function FormField({ control, name, label, secure, email }: FormFieldProps) {
 
 export default function SignUpScreen() {
   const router = useRouter();
+
   const { control, handleSubmit } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
@@ -79,44 +83,58 @@ export default function SignUpScreen() {
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-      automaticallyAdjustKeyboardInsets={true}
-    >
-      <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.subtitle}>Enter your information below.</Text>
-
-      <FormField control={control} name="firstName" label="First Name" />
-      <FormField control={control} name="lastName" label="Last Name" />
-      <FormField control={control} name="email" label="Email" email />
-      <FormField control={control} name="password" label="Password" secure />
-      <FormField
-        control={control}
-        name="confirmPassword"
-        label="Confirm Password"
-        secure
-      />
-
-      <Pressable
-        style={styles.button}
-        onPress={() => {
-          handleSubmit(onSubmit)();
-        }}
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets={true}
+        showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </Pressable>
-    </ScrollView>
+        <Text style={styles.title}>Sign Up</Text>
+        <Text style={styles.subtitle}>
+          Enter your information below.
+        </Text>
+
+        <FormField control={control} name="firstName" label="First Name" />
+        <FormField control={control} name="lastName" label="Last Name" />
+        <FormField control={control} name="email" label="Email" email />
+        <FormField control={control} name="password" label="Password" secure />
+        <FormField
+          control={control}
+          name="confirmPassword"
+          label="Confirm Password"
+          secure
+        />
+
+        <Pressable
+          style={styles.button}
+          onPress={() => {
+            handleSubmit(onSubmit)();
+          }}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </Pressable>
+
+        <PublicRecords />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  scrollView: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
-    justifyContent: "center",
     padding: 24,
     paddingBottom: 48,
-    backgroundColor: "#FFFFFF",
   },
   title: {
     fontSize: 28,
