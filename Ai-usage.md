@@ -1,5 +1,10 @@
-AI Usage
+# AI Usage
 
-Tool used: ChatGPT (OpenAI)
+**Tool used:** ChatGPT (OpenAI)
 
-I used it to troubleshoot a TypeScript error, helped me with an issue I was having with keyboard covering part of the screen, got it to format some of comments to look more neat, and used it to format my read.me. 
+ChatGPT helped me with:
+
+- Troubleshooting a couple TypeScript errors.
+- Fixing scrolling and keyboard-related layout problems.
+- Adjusting the navigation animation so returning from Sign In to Sign Up feels like pressing a back button.
+- Organizing code, improving comments, and formatting the README.

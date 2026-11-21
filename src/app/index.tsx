@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import {
@@ -8,6 +9,7 @@ import {
   type FieldPath,
 } from "react-hook-form";
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import PublicRecords from "../components/PublicRecords";
+import { useAuth } from "../contexts/AuthContext";
 import { signUpSchema, type SignUpValues } from "../schemas/signup-schema";
 
 type FormFieldProps = {
@@ -59,8 +62,14 @@ function FormField({ control, name, label, secure, email }: FormFieldProps) {
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { signUp } = useAuth();
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const { control, handleSubmit } = useForm<SignUpValues>({
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     mode: "onSubmit",
     defaultValues: {
@@ -72,14 +81,71 @@ export default function SignUpScreen() {
     },
   });
 
-  function onSubmit({ firstName, lastName, email }: SignUpValues) {
-    // Passwords are intentionally excluded from the submission log.
-    console.log("Sign-up form submitted:", { firstName, lastName, email });
+  async function onSubmit({
+    firstName,
+    lastName,
+    email,
+    password,
+  }: SignUpValues) {
+    setErrorMessage("");
 
-    router.push({
-      pathname: "/confirmation",
-      params: { firstName },
-    });
+    try {
+      const session = await signUp(
+        email,
+        password,
+        firstName,
+        lastName
+      );
+
+      if (session) {
+        router.replace("/home");
+      } else {
+        router.replace({
+          pathname: "/confirmation",
+          params: {
+            firstName,
+            status: "check-email",
+          },
+        });
+      }
+
+    } catch (error) {
+      if (error instanceof Error) {
+        const message = error.message.toLowerCase();
+
+        if (
+          message.includes("already registered") ||
+          message.includes("already exists")
+        ) {
+          setErrorMessage("This email may already be registered.");
+        } else if (
+          message.includes("weak password") ||
+          message.includes("password should")
+        ) {
+          setErrorMessage("Please choose a stronger password.");
+        } else if (
+          message.includes("network") ||
+          message.includes("failed to fetch")
+        ) {
+          setErrorMessage(
+            "Network error. Check your internet connection."
+          );
+        } else if (
+          message.includes("rate limit") ||
+          message.includes("too many requests")
+        ) {
+          setErrorMessage(
+            "Too many attempts. Please try again later."
+          );
+        } else {
+          setErrorMessage(
+            "Unable to create your account. Please try again."
+          );
+        }
+      } else {
+        setErrorMessage("Something went wrong. Please try again.");
+      }
+    }
   }
 
   return (
@@ -108,13 +174,32 @@ export default function SignUpScreen() {
           secure
         />
 
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
+
         <Pressable
-          style={styles.button}
+          style={[styles.button, isSubmitting && styles.buttonDisabled]}
           onPress={() => {
             handleSubmit(onSubmit)();
           }}
+          disabled={isSubmitting}
         >
-          <Text style={styles.buttonText}>Sign Up</Text>
+          {isSubmitting ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.buttonText}>Sign Up</Text>
+          )}
+        </Pressable>
+
+        <Pressable
+          style={styles.link}
+          onPress={() => router.push("/sign-in")}
+          disabled={isSubmitting}
+        >
+          <Text style={styles.linkText}>
+            Already have an account? Sign In
+          </Text>
         </Pressable>
 
         <PublicRecords />
@@ -166,7 +251,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#DC2626",
     fontSize: 13,
-    marginTop: 4,
+    marginTop: 8,
   },
   button: {
     backgroundColor: "#2563EB",
@@ -175,9 +260,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 28,
   },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  link: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  linkText: {
+    color: "#2563EB",
+    fontSize: 15,
   },
 });
