@@ -14,7 +14,7 @@ React Hook Form and Zod are used for form validation, while Expo Router and Reac
 - Support email verification during registration.
 - Keep users signed in when the app restarts.
 - Protect the Home screen from unauthenticated users.
-- Display the signed-in user's name and email in the navigation bar.
+- Display the signed-in user's first name or email in the navigation bar.
 - Retrieve public and protected records from Supabase using Row Level Security (RLS).
 
 ## Run the Project
