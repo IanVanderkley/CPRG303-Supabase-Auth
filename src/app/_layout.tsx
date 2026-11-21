@@ -1,7 +1,7 @@
-
 import { useEffect } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { Text } from "react-native";
 
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 
@@ -23,6 +23,12 @@ function SplashScreenController() {
 function RootNavigator() {
   const { user } = useAuth();
 
+  const firstName = user?.user_metadata?.first_name;
+  const displayName =
+    typeof firstName === "string" && firstName.trim()
+      ? firstName
+      : user?.email ?? "User";
+
   return (
     <Stack>
       <Stack.Protected guard={!user} redirectTo="/home">
@@ -43,7 +49,25 @@ function RootNavigator() {
       <Stack.Protected guard={!!user} redirectTo="/">
         <Stack.Screen
           name="home"
-          options={{ headerShown: false }}
+          options={{
+            title: "Home",
+            headerShown: true,
+            headerTransparent: false,
+            headerLargeTitle: false,
+            headerRight: () => (
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontSize: 15,
+                  fontWeight: "600",
+                  color: "#333333",
+                  maxWidth: 150,
+                }}
+              >
+                Hi, {displayName}
+              </Text>
+            ),
+          }}
         />
       </Stack.Protected>
     </Stack>

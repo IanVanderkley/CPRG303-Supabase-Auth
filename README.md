@@ -14,7 +14,7 @@ React Hook Form and Zod are used for form validation, while Expo Router and Reac
 - Support email verification during registration.
 - Keep users signed in when the app restarts.
 - Protect the Home screen from unauthenticated users.
-- Display the signed-in user's name and email.
+- Display the signed-in user's name and email in the navigation bar.
 - Retrieve public and protected records from Supabase using Row Level Security (RLS).
 
 ## Run the Project
@@ -40,9 +40,33 @@ npx expo start
 
 Open the app using Expo Go or an emulator.
 
-The Supabase project must have a `demo` table with the appropriate Row Level Security policies configured for public and authenticated access.
-
 Do not commit your `.env` file to GitHub.
+
+## Supabase Setup
+
+The project uses Supabase Authentication with email and password sign-in.
+
+A table named `demo` was created in the public schema with the following columns:
+
+- `id` – Primary key
+- `title` – Record title
+- `description` – Record description
+- `is_public` – Determines whether a record is public
+
+The table contains four sample records: two public records and two protected records.
+
+Row Level Security (RLS) is enabled with SELECT policies that allow:
+
+- Anonymous users to read only records where `is_public` is true.
+- Authenticated users to read all records.
+
+Public records appear on the Sign-Up screen, while protected records appear on the authenticated Home screen.
+
+## Testing
+
+Users can create an account using the Sign-Up screen, confirm their email if required, and sign in to access the protected Home screen.
+
+No shared test account credentials are included. A new account can be created for testing.
 
 ## Technologies
 
